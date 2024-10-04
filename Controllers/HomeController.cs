@@ -1,21 +1,24 @@
 using Atelier1.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using VotreNamespace.Models;
+using VotreNamespace.Models.Repositories;
 
 namespace Atelier1.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IRepository<Employee> _employeeRepository;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IRepository<Employee> employeeRepository)
         {
-            _logger = logger;
+            _employeeRepository = employeeRepository;
         }
 
         public IActionResult Index()
         {
-            return View();
+            var employees = _employeeRepository.GetAll();
+            return View(employees);
         }
 
         public IActionResult Privacy()

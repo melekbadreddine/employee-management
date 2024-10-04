@@ -1,11 +1,14 @@
-﻿public interface IRepository<T>
+﻿using System.Collections.Generic;
 
+namespace VotreNamespace.Models.Repositories
 {
-    IList<T> GetAll();
-    T FindByID(int id);
-    void Add(T entity);
-    void Update(int id, T entity);
-    void Delete(int id);
-    List<T> Search(string term);
-
+    public interface IRepository<T>
+    {
+        IList<T> GetAll();
+        T FindByID(int id);
+        void Add(T entity);
+        void Update(int id, T entity);
+        void Delete(int id);
+        List<T> Search(string term);
+    }
 }

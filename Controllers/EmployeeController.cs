@@ -1,83 +1,91 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using VotreNamespace.Models;
+using VotreNamespace.Models.Repositories;
 
-namespace Atelier1.Controllers
+namespace VotreNamespace.Controllers
 {
     public class EmployeeController : Controller
     {
-        // GET: EmployeeController
+        readonly IRepository<Employee> employeeRepository;
+
+        public EmployeeController(IRepository<Employee> empRepository)
+        {
+            employeeRepository = empRepository;
+        }
+
         public ActionResult Index()
         {
-            return View();
+            return View(employeeRepository.GetAll());
         }
 
-        // GET: EmployeeController/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            var employee = employeeRepository.FindByID(id);
+            if (employee == null)
+                return NotFound();
+            return View(employee);
         }
 
-        // GET: EmployeeController/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: EmployeeController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Employee e)
         {
-            try
+            if (ModelState.IsValid)
             {
+                employeeRepository.Add(e);
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+            return View(e);
         }
 
-        // GET: EmployeeController/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            var employee = employeeRepository.FindByID(id);
+            if (employee == null)
+                return NotFound();
+            return View(employee);
         }
 
-        // POST: EmployeeController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, Employee newemployee)
         {
-            try
+            if (id != newemployee.Id)
+                return NotFound();
+
+            if (ModelState.IsValid)
             {
+                employeeRepository.Update(id, newemployee);
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+            return View(newemployee);
         }
 
-        // GET: EmployeeController/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            var employee = employeeRepository.FindByID(id);
+            if (employee == null)
+                return NotFound();
+            return View(employee);
         }
 
-        // POST: EmployeeController/Delete/5
-        [HttpPost]
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult DeleteConfirmed(int id)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            employeeRepository.Delete(id);
+            return RedirectToAction(nameof(Index));
+        }
+
+        public ActionResult Search(string term)
+        {
+            var results = employeeRepository.Search(term);
+            return View("Index", results);
         }
     }
 }
